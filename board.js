@@ -65,7 +65,7 @@ class Board {
 
   removeChar() {
     this.#nextIndex--;
-    if (this.#nextIndex <= 0) {
+    if (this.#nextIndex < 0) {
       this.#index = 0;
       this.#nextIndex = 0;
       return;

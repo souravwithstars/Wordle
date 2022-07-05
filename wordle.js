@@ -80,7 +80,7 @@
 
   const showCorrectWord = board => {
     const actualWord = board.getActual();
-    setTimeout(() => alert(`Oops! The Correct Word Is ${actualWord}`), 1000);
+    setTimeout(() => alert(`Oops! The Correct Word Is ${actualWord}`), 200);
     return;
   };
 
@@ -101,7 +101,7 @@
 
   const declaredWinner = board => {
     removeListeneners(board);
-    setTimeout(() => alert('You Guessed The Correct Word'), 1000);
+    setTimeout(() => alert('You Guessed The Correct Word'), 200);
   };
 
   const validator = board => {
@@ -162,7 +162,7 @@
 
   const main = () => {
     const wordBlocks = ['word-1', 'word-2', 'word-3', 'word-4', 'word-5', 'word-6'];
-    const actual = 'EARTH';
+    const actual = 'PILER';
     const board = new Board(wordBlocks, actual);
     const letterSpans = document.getElementsByClassName('char');
     [...letterSpans].forEach(span => {
