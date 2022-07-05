@@ -95,9 +95,14 @@ class Board {
 }
 
 const checkCorrect = (actual, typed) => {
+  const checkingArray = actual.split('');
   const correctChars = typed.split('').filter((char, index) => char === actual[index]);
 
-  const correctSpots = correctChars.map(char => actual.indexOf(char));
+  const correctSpots = correctChars.map(char => {
+    const index = checkingArray.indexOf(char);
+    checkingArray[index] = null;
+    return index;
+  });
   return correctSpots;
 };
 
