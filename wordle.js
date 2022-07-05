@@ -160,10 +160,17 @@
     };
   };
 
+  const randomInt = number => {
+    return Math.floor(Math.random() * number);
+  };
+
   const main = () => {
     const wordBlocks = ['word-1', 'word-2', 'word-3', 'word-4', 'word-5', 'word-6'];
-    const actual = 'PILER';
-    const board = new Board(wordBlocks, actual);
+    const words = ['PUPPY', 'WATCH', 'LIGHT', 'CANDY', 'CYCLE', 'TRUCK', 'NORTH', 'DRESS', 'SCENT', 'WITCH'];
+    const randomIndex = randomInt(words.length);
+    const actualWord = words[randomIndex];
+
+    const board = new Board(wordBlocks, actualWord);
     const letterSpans = document.getElementsByClassName('char');
     [...letterSpans].forEach(span => {
       span.onclick = handleClickForAdd(board);
