@@ -95,6 +95,8 @@
 
     const enterKey = document.getElementById('enter');
     enterKey.onclick = null;
+
+    document.onkeydown = null;
   };
 
   const declaredWinner = board => {
@@ -125,20 +127,37 @@
       const letter = event.target.innerText;
       board.addChar(letter);
       displayChar(board);
-    }
+    };
   };
 
   const handleClickForBackSpace = board => {
     return event => {
       board.removeChar();
       deleteChar(board);
-    }
+    };
   };
 
   const handleclickForEnter = board => {
     return event => {
       validator(board);
-    }
+    };
+  };
+
+  const handleKeyDown = board => {
+    return event => {
+      const key = event.key.toUpperCase();
+      if (key >= 'A' && key <= 'Z' && key.length === 1) {
+        board.addChar(key);
+        displayChar(board);
+      }
+      if (key === 'BACKSPACE') {
+        board.removeChar();
+        deleteChar(board);
+      }
+      if (key === 'ENTER') {
+        validator(board);
+      }
+    };
   };
 
   const main = () => {
@@ -156,20 +175,7 @@
     const enterKey = document.getElementById('enter');
     enterKey.onclick = handleclickForEnter(board);
 
-    document.addEventListener('keydown', (event) => {
-      const key = event.key.toUpperCase();
-      if (key >= 'A' && key <= 'Z' && key.length === 1) {
-        board.addChar(key);
-        displayChar(board);
-      }
-      if (key === 'BACKSPACE') {
-        board.removeChar();
-        deleteChar(board);
-      }
-      if (key === 'ENTER') {
-        validator(board);
-      }
-    });
+    document.onkeydown = handleKeyDown(board);
   };
 
   window.onload = main;
