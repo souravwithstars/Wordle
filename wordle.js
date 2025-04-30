@@ -1,4 +1,14 @@
 (function () {
+  const loadFiveLetterWords = async () => {
+    const response = await fetch('https://raw.githubusercontent.com/dwyl/english-words/master/words.txt');
+    const text = await response.text();
+    const words = text.split('\n')
+        .map(word => word.trim().toLowerCase())
+        .filter(word => word.length === 5 && /^[a-z]+$/.test(word));
+
+    return new Set(words);
+  };
+
   const generateRandomWord = async () => {
     try {
       const response = await fetch('https://random-word-api.herokuapp.com/word?length=5');
@@ -16,8 +26,7 @@
     const divElement = document.getElementById(divName);
     if (index <= 4) {
       const span = divElement.children[index];
-      const lastCharacterTyped = board.getLastCharacterTyped();
-      span.innerText = lastCharacterTyped;
+      span.innerText = board.getLastCharacterTyped();
     }
   };
 
@@ -79,6 +88,13 @@
     return typedWord.length !== 5;
   };
 
+  const unknownWord = async board => {
+    const typedWord = board.getTypedWord().toLowerCase();
+    const validWords = await loadFiveLetterWords();
+
+    return ![...validWords].includes(typedWord);
+  };
+
   const guessCorrect = board => {
     const correctSpots = board.getCorrectSpots();
     return correctSpots.length === 5;
@@ -92,10 +108,9 @@
   const showCorrectWord = board => {
     const actualWord = board.getActual();
     setTimeout(() => alert(`Oops! The Correct Word Is ${actualWord}`), 200);
-    return;
   };
 
-  const removeListeneners = board => {
+  const removeListeners = () => {
     const spans = document.getElementsByClassName('char');
     [...spans].forEach(span => {
       span.onclick = null;
@@ -110,26 +125,31 @@
     document.onkeydown = null;
   };
 
-  const declaredWinner = board => {
-    removeListeneners(board);
+  const declaredWinner = () => {
+    removeListeners();
     setTimeout(() => alert('You Guessed The Correct Word'), 200);
   };
 
-  const validator = board => {
+  const validator = async board => {
     if (wrongLength(board)) {
       alert('Please Insert 5 Letters Word');
+      return;
+    }
+
+    const isUnknown = await unknownWord(board);
+    if (isUnknown) {
+      alert('Not a Word');
       return;
     }
     board.validate();
     makeColor(board);
     board.changeResources();
     if (guessCorrect(board)) {
-      declaredWinner(board);
+      declaredWinner();
       return;
     }
     if (allGuessWrong(board)) {
       showCorrectWord(board);
-      return;
     }
   };
 
@@ -142,20 +162,20 @@
   };
 
   const handleClickForBackSpace = board => {
-    return event => {
+    return () => {
       board.removeChar();
       deleteChar(board);
     };
   };
 
-  const handleclickForEnter = board => {
-    return event => {
-      validator(board);
+  const handleClickForEnter = board => {
+    return async () => {
+      await validator(board);
     };
   };
 
   const handleKeyDown = board => {
-    return event => {
+    return async event => {
       const key = event.key.toUpperCase();
       if (key >= 'A' && key <= 'Z' && key.length === 1) {
         board.addChar(key);
@@ -166,14 +186,14 @@
         deleteChar(board);
       }
       if (key === 'ENTER') {
-        validator(board);
+        await validator(board);
       }
     };
   };
 
-  const main = async () => {
+  window.onload = async () => {
     const wordBlocks = ['word-1', 'word-2', 'word-3', 'word-4', 'word-5', 'word-6'];
-    const wordsToGuess =  await generateRandomWord();
+    const wordsToGuess = await generateRandomWord();
 
     const board = new Board(wordBlocks, wordsToGuess.toUpperCase());
     const letterSpans = document.getElementsByClassName('char');
@@ -185,10 +205,8 @@
     backspaceKey.onclick = handleClickForBackSpace(board);
 
     const enterKey = document.getElementById('enter');
-    enterKey.onclick = handleclickForEnter(board);
+    enterKey.onclick = handleClickForEnter(board);
 
     document.onkeydown = handleKeyDown(board);
   };
-
-  window.onload = main;
 })();
