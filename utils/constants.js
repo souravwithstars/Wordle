@@ -1,0 +1,15 @@
+const WORD_BLOCKS = ['word-1', 'word-2', 'word-3', 'word-4', 'word-5', 'word-6'];
+const LETTERS = 'char';
+const BACKSPACE = 'backspace';
+const ENTER = 'enter';
+const NOT_A_WORD = 'Not a Word';
+const FIVE_LETTERS_ALERT_MESSAGE = 'Please Insert 5 Letters Word';
+const WINNING_MESSAGE = 'You Guessed The Correct Word';
+const MAX_GUESS = 6;
+const WORD_LENGTH = 5;
+const BACKGROUND_COLOR = 'background-color';
+const BORDER_COLOR = 'border-color';
+const WHITE = 'white';
+const GREEN = 'rgb(106, 170, 99, 1)';
+const YELLOW = 'rgb(202, 180, 88, 1)';
+const GREY = 'rgb(120, 124, 126, 1)';

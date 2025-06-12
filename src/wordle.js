@@ -1,25 +1,4 @@
 (function () {
-  const loadFiveLetterWords = async () => {
-    const response = await fetch('https://raw.githubusercontent.com/dwyl/english-words/master/words.txt');
-    const text = await response.text();
-    const words = text.split('\n')
-        .map(word => word.trim().toLowerCase())
-        .filter(word => word.length === 5 && /^[a-z]+$/.test(word));
-
-    return new Set(words);
-  };
-
-  const generateRandomWord = async () => {
-    try {
-      const response = await fetch('https://random-word-api.vercel.app/api?words=1&length=5');
-      const data = await response.json();
-      return data[0];
-    } catch (error) {
-      console.error('Error fetching word:', error);
-      return null;
-    }
-  };
-
   const displayChar = board => {
     const divName = board.getDivName();
     const index = board.getIndex();
@@ -41,34 +20,29 @@
     span.innerText = '';
   };
 
-  const changeBoxStyle = span => {
-    span.style.color = 'white';
-    span.style['border-color'] = 'white';
-  };
-
-  const colorGreen = (index, board) => {
+  const colorGreenOnBoard = (index, board) => {
     const divName = board.getDivName();
     const div = document.getElementById(divName);
     const span = div.children[index];
-    span.style['background-color'] = 'rgb(106, 170, 99, 1)';
+    colorGreen(span);
     changeBoxStyle(span);
   };
 
-  const colorYellow = (index, board) => {
+  const colorYellowOnBoard = (index, board) => {
     const divName = board.getDivName();
     const div = document.getElementById(divName);
     const span = div.children[index];
-    span.style['background-color'] = 'rgb(202, 180, 88, 1)';
+    colorYellow(span);
     changeBoxStyle(span);
   };
 
-  const colorGrey = (correctSpots, wrongSpots, board) => {
+  const colorGreyOnBoard = (correctSpots, wrongSpots, board) => {
     const divName = board.getDivName();
     const div = document.getElementById(divName);
-    for (let i = 0; i < 5; i++) {
-      if (!(correctSpots.includes(i) || wrongSpots.includes(i))) {
-        const span = div.children[i];
-        span.style['background-color'] = 'rgb(120, 124, 126, 1)';
+    for (let index = 0; index < 5; index++) {
+      if (!(correctSpots.includes(index) || wrongSpots.includes(index))) {
+        const span = div.children[index];
+        colorGrey(span);
         changeBoxStyle(span);
       }
     }
@@ -76,30 +50,29 @@
 
   const colorGreenOnKeyboard = letterId => {
     const letterSpan = document.getElementById(letterId);
-    letterSpan.style['background-color'] = 'rgb(106, 170, 99, 1)';
+    colorGreen(letterSpan);
     changeBoxStyle(letterSpan);
   };
 
   const colorYellowOnKeyboard = letterId => {
     const letterSpan = document.getElementById(letterId);
-    letterSpan.style['background-color'] = 'rgb(202, 180, 88, 1)';
+    colorYellow(letterSpan);
     changeBoxStyle(letterSpan);
   };
 
   const colorGreyOnKeyboard = letterId => {
     const letterSpan = document.getElementById(letterId);
-    letterSpan.style['background-color'] = 'rgb(120, 124, 126, 1)';
+    colorGrey(letterSpan);
     changeBoxStyle(letterSpan);
   };
-
 
   const makeColorOnBoard = board => {
     const correctSpots = board.getCorrectSpots();
     const wrongSpots = board.getWrongSpots();
 
-    correctSpots.forEach(spot => colorGreen(spot, board));
-    wrongSpots.forEach(spot => colorYellow(spot, board));
-    colorGrey(correctSpots, wrongSpots, board);
+    correctSpots.forEach(spot => colorGreenOnBoard(spot, board));
+    wrongSpots.forEach(spot => colorYellowOnBoard(spot, board));
+    colorGreyOnBoard(correctSpots, wrongSpots, board);
   };
 
   const makeColorOnKeyboard = keyboard => {
@@ -114,7 +87,7 @@
 
   const wrongLength = board => {
     const typedWord = board.getTypedWord();
-    return typedWord.length !== 5;
+    return typedWord.length !== WORD_LENGTH;
   };
 
   const unknownWord = async board => {
@@ -126,29 +99,29 @@
 
   const guessCorrect = board => {
     const correctSpots = board.getCorrectSpots();
-    return correctSpots.length === 5;
+    return correctSpots.length === WORD_LENGTH;
   };
 
   const allGuessWrong = board => {
     const guessedCount = board.getGuessedCount();
-    return guessedCount >= 6;
+    return guessedCount >= MAX_GUESS;
   };
 
   const showCorrectWord = board => {
     const actualWord = board.getActual();
-    setTimeout(() => alert(`Oops! The Correct Word Is ${actualWord}`), 200);
+    setTimeout(() => alert(showCorrectWordMessage(actualWord)), 200);
   };
 
   const removeListeners = () => {
-    const spans = document.getElementsByClassName('char');
+    const spans = document.getElementsByClassName(LETTERS);
     [...spans].forEach(span => {
       span.onclick = null;
     });
 
-    const backspaceKey = document.getElementById('backspace');
+    const backspaceKey = document.getElementById(BACKSPACE);
     backspaceKey.onclick = null;
 
-    const enterKey = document.getElementById('enter');
+    const enterKey = document.getElementById(ENTER);
     enterKey.onclick = null;
 
     document.onkeydown = null;
@@ -156,25 +129,29 @@
 
   const declaredWinner = () => {
     removeListeners();
-    setTimeout(() => alert('You Guessed The Correct Word'), 200);
+    setTimeout(() => alert(WINNING_MESSAGE), 200);
   };
 
   const validator = async (board, keyboard) => {
     if (wrongLength(board)) {
-      alert('Please Insert 5 Letters Word');
+      alert(FIVE_LETTERS_ALERT_MESSAGE);
       return;
     }
 
     const isUnknown = await unknownWord(board);
     if (isUnknown) {
-      alert('Not a Word');
+      alert(NOT_A_WORD);
       return;
     }
+
     board.validate();
     keyboard.validate(board.getTypedWord(), board.getCorrectSpots(), board.getWrongSpots());
+
     makeColorOnBoard(board);
     makeColorOnKeyboard(keyboard);
+
     board.changeResources();
+
     if (guessCorrect(board)) {
       declaredWinner();
       return;
@@ -212,31 +189,31 @@
         board.addChar(key);
         displayChar(board);
       }
-      if (key === 'BACKSPACE') {
+      if (key.toLowerCase() === BACKSPACE) {
         board.removeChar();
         deleteChar(board);
       }
-      if (key === 'ENTER') {
+      if (key.toLowerCase() === ENTER) {
         await validator(board, keyboard);
       }
     };
   };
 
   window.onload = async () => {
-    const wordBlocks = ['word-1', 'word-2', 'word-3', 'word-4', 'word-5', 'word-6'];
-    const wordsToGuess = await generateRandomWord();
+    const wordToGuess = await generateRandomWord();
 
-    const board = new Board(wordBlocks, wordsToGuess.toUpperCase());
+    const board = new Board(WORD_BLOCKS, wordToGuess.toUpperCase());
     const keyboard = new Keyboard();
-    const letterSpans = document.getElementsByClassName('char');
+
+    const letterSpans = document.getElementsByClassName(LETTERS);
     [...letterSpans].forEach(span => {
       span.onclick = handleClickForAdd(board);
     });
 
-    const backspaceKey = document.getElementById('backspace');
+    const backspaceKey = document.getElementById(BACKSPACE);
     backspaceKey.onclick = handleClickForBackSpace(board);
 
-    const enterKey = document.getElementById('enter');
+    const enterKey = document.getElementById(ENTER);
     enterKey.onclick = handleClickForEnter(board, keyboard);
 
     document.onkeydown = handleKeyDown(board, keyboard);
