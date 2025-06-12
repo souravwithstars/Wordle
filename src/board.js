@@ -98,21 +98,22 @@ const checkCorrect = (actual, typed) => {
   const checkingArray = actual.split('');
   const correctChars = typed.split('').filter((char, index) => char === actual[index]);
 
-  const correctSpots = correctChars.map(char => {
+  return correctChars.map(char => {
     const index = checkingArray.indexOf(char);
     checkingArray[index] = null;
     return index;
   });
-  return correctSpots;
 };
 
 const checkWrong = (actual, typed, correctSpots) => {
   const wrongSpots = [];
+  const wrongLetters = new Set();
   const actualWord = actual.split('');
   for (let i = 0; i < typed.length; i++) {
     if (!correctSpots.includes(i)) {
-      for (j = 0; j < typed.length; j++) {
-        if (typed[j] === actual[i]) {
+      for (let j = 0; j < typed.length; j++) {
+        if (typed[j] === actualWord[i] && !wrongLetters.has(actualWord[i])) {
+          wrongLetters.add(actualWord[i]);
           wrongSpots.push(j);
         }
       }

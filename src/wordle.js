@@ -11,7 +11,7 @@
 
   const generateRandomWord = async () => {
     try {
-      const response = await fetch('https://random-word-api.herokuapp.com/word?length=5');
+      const response = await fetch('https://random-word-api.vercel.app/api?words=1&length=5');
       const data = await response.json();
       return data[0];
     } catch (error) {
@@ -74,13 +74,42 @@
     }
   };
 
-  const makeColor = board => {
+  const colorGreenOnKeyboard = letterId => {
+    const letterSpan = document.getElementById(letterId);
+    letterSpan.style['background-color'] = 'rgb(106, 170, 99, 1)';
+    changeBoxStyle(letterSpan);
+  };
+
+  const colorYellowOnKeyboard = letterId => {
+    const letterSpan = document.getElementById(letterId);
+    letterSpan.style['background-color'] = 'rgb(202, 180, 88, 1)';
+    changeBoxStyle(letterSpan);
+  };
+
+  const colorGreyOnKeyboard = letterId => {
+    const letterSpan = document.getElementById(letterId);
+    letterSpan.style['background-color'] = 'rgb(120, 124, 126, 1)';
+    changeBoxStyle(letterSpan);
+  };
+
+
+  const makeColorOnBoard = board => {
     const correctSpots = board.getCorrectSpots();
     const wrongSpots = board.getWrongSpots();
 
     correctSpots.forEach(spot => colorGreen(spot, board));
     wrongSpots.forEach(spot => colorYellow(spot, board));
     colorGrey(correctSpots, wrongSpots, board);
+  };
+
+  const makeColorOnKeyboard = keyboard => {
+    const correctLetters = keyboard.getCorrectLetters();
+    const wrongPositionedLetters = keyboard.getWrongPositionLetters();
+    const wrongLetters = keyboard.getWrongLetters();
+
+    correctLetters.forEach((value, _) => colorGreenOnKeyboard(value));
+    wrongPositionedLetters.forEach((value, _) => colorYellowOnKeyboard(value));
+    wrongLetters.forEach((value, _) => colorGreyOnKeyboard(value));
   };
 
   const wrongLength = board => {
@@ -130,7 +159,7 @@
     setTimeout(() => alert('You Guessed The Correct Word'), 200);
   };
 
-  const validator = async board => {
+  const validator = async (board, keyboard) => {
     if (wrongLength(board)) {
       alert('Please Insert 5 Letters Word');
       return;
@@ -142,7 +171,9 @@
       return;
     }
     board.validate();
-    makeColor(board);
+    keyboard.validate(board.getTypedWord(), board.getCorrectSpots(), board.getWrongSpots());
+    makeColorOnBoard(board);
+    makeColorOnKeyboard(keyboard);
     board.changeResources();
     if (guessCorrect(board)) {
       declaredWinner();
@@ -168,13 +199,13 @@
     };
   };
 
-  const handleClickForEnter = board => {
+  const handleClickForEnter = (board, keyboard) => {
     return async () => {
-      await validator(board);
+      await validator(board, keyboard);
     };
   };
 
-  const handleKeyDown = board => {
+  const handleKeyDown = (board, keyboard) => {
     return async event => {
       const key = event.key.toUpperCase();
       if (key >= 'A' && key <= 'Z' && key.length === 1) {
@@ -186,7 +217,7 @@
         deleteChar(board);
       }
       if (key === 'ENTER') {
-        await validator(board);
+        await validator(board, keyboard);
       }
     };
   };
@@ -196,6 +227,7 @@
     const wordsToGuess = await generateRandomWord();
 
     const board = new Board(wordBlocks, wordsToGuess.toUpperCase());
+    const keyboard = new Keyboard();
     const letterSpans = document.getElementsByClassName('char');
     [...letterSpans].forEach(span => {
       span.onclick = handleClickForAdd(board);
@@ -205,8 +237,8 @@
     backspaceKey.onclick = handleClickForBackSpace(board);
 
     const enterKey = document.getElementById('enter');
-    enterKey.onclick = handleClickForEnter(board);
+    enterKey.onclick = handleClickForEnter(board, keyboard);
 
-    document.onkeydown = handleKeyDown(board);
+    document.onkeydown = handleKeyDown(board, keyboard);
   };
 })();

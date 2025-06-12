@@ -3,8 +3,9 @@
   <head>
     <title>Wordle - A daily word game</title>
     <link rel="stylesheet" href="css/wordle.css">
-    <script src="./wordle.js"></script>
-    <script src="./board.js"></script>
+    <script src="src/wordle.js"></script>
+    <script src="src/board.js"></script>
+    <script src="src/keyboard.js"></script>
   </head>
 
   <body>
@@ -61,37 +62,37 @@
 
       <div class="keyboard-container">
         <div>
-          <span class="char">Q</span>
-          <span class="char">W</span>
-          <span class="char">E</span>
-          <span class="char">R</span>
-          <span class="char">T</span>
-          <span class="char">Y</span>
-          <span class="char">U</span>
-          <span class="char">I</span>
-          <span class="char">O</span>
-          <span class="char">P</span>
+          <span class="char" id="Q">Q</span>
+          <span class="char" id="W">W</span>
+          <span class="char" id="E">E</span>
+          <span class="char" id="R">R</span>
+          <span class="char" id="T">T</span>
+          <span class="char" id="Y">Y</span>
+          <span class="char" id="U">U</span>
+          <span class="char" id="I">I</span>
+          <span class="char" id="O">O</span>
+          <span class="char" id="P">P</span>
         </div>
         <div>
-          <span class="char">A</span>
-          <span class="char">S</span>
-          <span class="char">D</span>
-          <span class="char">F</span>
-          <span class="char">G</span>
-          <span class="char">H</span>
-          <span class="char">J</span>
-          <span class="char">K</span>
-          <span class="char">L</span>
+          <span class="char" id="A">A</span>
+          <span class="char" id="S">S</span>
+          <span class="char" id="D">D</span>
+          <span class="char" id="F">F</span>
+          <span class="char" id="G">G</span>
+          <span class="char" id="H">H</span>
+          <span class="char" id="J">J</span>
+          <span class="char" id="K">K</span>
+          <span class="char" id="L">L</span>
         </div>
         <div>
           <span id="enter">ENTER</span>
-          <span class="char">Z</span>
-          <span class="char">X</span>
-          <span class="char">C</span>
-          <span class="char">V</span>
-          <span class="char">B</span>
-          <span class="char">N</span>
-          <span class="char">M</span>
+          <span class="char" id="Z">Z</span>
+          <span class="char" id="X">X</span>
+          <span class="char" id="C">C</span>
+          <span class="char" id="V">V</span>
+          <span class="char" id="B">B</span>
+          <span class="char" id="N">N</span>
+          <span class="char" id="M">M</span>
           <span id="backspace">
             <img src="./image/backspace-icon.jpeg" alt="backspace">
           </span>
