@@ -21,7 +21,7 @@ class Board {
   }
 
   getDivName() {
-    return this.#wordBlocks[this.#guessedCount];
+    return this.#wordBlocks[this.getGuessedCount()];
   }
 
   getActual() {
@@ -32,12 +32,28 @@ class Board {
     return this.#index;
   }
 
+  setIndex(index) {
+    this.#index = index;
+  }
+
+  getNextIndex() {
+    return this.#nextIndex;
+  }
+
+  setNextIndex(index) {
+    this.#nextIndex = index;
+  }
+
   getTypedWord() {
     return this.#typed;
   }
 
+  setTypedWord(word) {
+    this.#typed = word;
+  }
+
   getLastCharacterTyped() {
-    const lastIndex = this.#typed.length - 1;
+    const lastIndex = this.getTypedWord().length - 1;
     return this.#typed[lastIndex];
   }
 
@@ -45,52 +61,75 @@ class Board {
     return this.#guessedCount;
   }
 
+  setGuessedCount(count) {
+    this.#guessedCount = count;
+  }
+
   getCorrectSpots() {
     return this.#correctSpots;
+  }
+
+  setCorrectSpots(spots) {
+    this.#correctSpots = spots;
   }
 
   getWrongSpots() {
     return this.#wrongSpots;
   }
 
+  setWrongSpots(spots) {
+    this.#wrongSpots = spots;
+  }
+
   addChar(character) {
-    this.#index = this.#nextIndex;
-    if (this.#index <= 4) {
-      this.#typed += character;
-      this.#nextIndex++;
+    this.setIndex(this.getNextIndex())
+    if (this.getIndex() <= 4) {
+      this.setTypedWord(this.getTypedWord() + character);
+      this.setNextIndex(this.getNextIndex() + 1);
       return;
     }
-    this.#nextIndex = 5;
+    this.setNextIndex(5);
   }
 
   removeChar() {
-    this.#nextIndex--;
-    if (this.#nextIndex < 0) {
-      this.#index = 0;
-      this.#nextIndex = 0;
+    this.setNextIndex(this.getNextIndex() - 1);
+    if (this.getNextIndex() < 0) {
+      this.setIndex(0);
+      this.setNextIndex(0);
       return;
     }
-    if (this.#index < 0) {
-      this.#index = 0;
-      this.#nextIndex = 0;
+    if (this.getIndex() < 0) {
+      this.setIndex(0);
+      this.setNextIndex(0);
       return;
     }
-    this.#index = this.#nextIndex;
-    this.#typed = this.#typed.slice(0, this.#typed.length - 1);
+    this.setIndex(this.getNextIndex());
+
+    const lastIndex = this.getTypedWord().length - 1;
+    this.setTypedWord(this.getTypedWord().slice(0, lastIndex));
   }
 
   validate() {
-    this.#correctSpots = checkCorrect(this.#actual, this.#typed);
-    this.#wrongSpots = checkWrong(
-      this.#actual, this.#typed, this.#correctSpots
+    this.setCorrectSpots(
+        checkCorrect(
+            this.getActual(),
+            this.getTypedWord()
+        )
+    );
+    this.setWrongSpots(
+        checkWrong(
+            this.getActual(),
+            this.getTypedWord(),
+            this.getCorrectSpots()
+        )
     );
   }
 
   changeResources() {
-    this.#typedWords.push(this.getTypedWord);
-    this.#typed = '';
-    this.#guessedCount += 1;
-    this.#nextIndex = 0;
+    this.#typedWords.push(this.getTypedWord());
+    this.setTypedWord('');
+    this.setGuessedCount(this.getGuessedCount() + 1);
+    this.setNextIndex(0);
   }
 }
 
